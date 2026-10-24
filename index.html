@@ -1,0 +1,197 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Haprion - a web interface for small HAProxy clusters</title>
+<meta name="description" content="Haprion runs small HAProxy clusters from one web interface: load balancing, a keepalived virtual address that moves between the nodes, a Coraza WAF and certificates. Installed with apt on Ubuntu 26.04 or Debian 13.">
+<link rel="canonical" href="https://haprion.github.io/">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Haprion">
+<meta property="og:description" content="Run small HAProxy clusters from one place - load balancing, failover, a WAF and certificates - without having to master HAProxy.">
+<meta property="og:url" content="https://haprion.github.io/">
+<meta name="color-scheme" content="light dark">
+<style>
+:root {
+  --bg: #ffffff;
+  --text: #1f2328;
+  --muted: #59636e;
+  --line: #d1d9e0;
+  --panel: #f6f8fa;
+  --accent: #0b6bcb;
+  --code-bg: #f6f8fa;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #0d1117;
+    --text: #e6edf3;
+    --muted: #9198a1;
+    --line: #3d444d;
+    --panel: #151b23;
+    --accent: #4493f8;
+    --code-bg: #151b23;
+  }
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font: 16px/1.6 -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans", Helvetica, Arial, sans-serif;
+}
+main { max-width: 1200px; margin: 0 auto; padding: 0 24px 64px; }
+header { padding: 56px 0 24px; }
+h1 { font-size: 3rem; margin: 0 0 8px; letter-spacing: -0.02em; }
+.lead { font-size: 1.3rem; color: var(--muted); margin: 0 0 24px; max-width: 44em; }
+.links { display: flex; flex-wrap: wrap; gap: 12px; margin: 0; padding: 0; list-style: none; }
+.links a {
+  display: inline-block; padding: 8px 16px; border: 1px solid var(--line); border-radius: 6px;
+  color: var(--text); text-decoration: none; font-weight: 600;
+}
+.links a.primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+.status {
+  margin: 32px 0 0; padding: 12px 16px; border: 1px solid var(--line); border-radius: 6px;
+  background: var(--panel); color: var(--muted);
+}
+h2 { font-size: 1.5rem; margin: 48px 0 16px; padding-bottom: 8px; border-bottom: 1px solid var(--line); }
+h3 { font-size: 1.05rem; margin: 0 0 8px; }
+figure { margin: 0; }
+figure img { width: 100%; max-width: 1000px; height: auto; display: block; margin: 0 auto; }
+figcaption { color: var(--muted); font-size: 0.95rem; margin-top: 8px; }
+.grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+.card { border: 1px solid var(--line); border-radius: 6px; padding: 16px; background: var(--panel); }
+.card ul { margin: 0; padding-left: 20px; }
+.card li { margin: 4px 0; }
+pre {
+  background: var(--code-bg); border: 1px solid var(--line); border-radius: 6px;
+  padding: 12px 16px; overflow-x: auto; font-size: 0.9rem; line-height: 1.45;
+}
+code { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
+p code, li code { background: var(--code-bg); padding: 1px 5px; border-radius: 4px; font-size: 0.9em; }
+a { color: var(--accent); }
+.distros { display: grid; grid-template-columns: minmax(0, 1fr); gap: 0 24px; }
+@media (min-width: 1200px) {
+  .distros { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .distros pre { font-size: 0.8rem; }
+}
+footer { color: var(--muted); font-size: 0.9rem; border-top: 1px solid var(--line); margin-top: 56px; padding-top: 16px; }
+@media (max-width: 720px) {
+  main { padding: 0 16px 48px; }
+  h1 { font-size: 2rem; }
+  .grid { grid-template-columns: minmax(0, 1fr); }
+}
+</style>
+</head>
+<body>
+<main>
+<header>
+  <h1>Haprion</h1>
+  <p class="lead">Run small HAProxy clusters from one place - load balancing, failover, a WAF and
+  certificates - without having to master HAProxy.</p>
+  <ul class="links">
+    <li><a class="primary" href="https://github.com/haprion/haprion/blob/main/docs/quickstart.md">Quickstart</a></li>
+    <li><a href="https://github.com/haprion/haprion">Source on GitHub</a></li>
+    <li><a href="https://github.com/haprion/haprion/releases/latest">Latest release</a></li>
+    <li><a href="https://github.com/haprion/haprion/blob/main/docs/user-manual.md">User manual</a></li>
+  </ul>
+  <p class="status">A hobby project for home labs and smaller companies, maintained best-effort. It
+  has not reached 1.0 and is not yet declared ready for production. See
+  <a href="https://github.com/haprion/haprion#project-status">Project status</a>.</p>
+</header>
+
+<h2>How an installation looks</h2>
+<figure>
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="images/installation-dark.svg">
+    <img src="images/installation-light.svg" width="900" height="470" alt="Clients reach the virtual address, which keepalived keeps on node-a of the HAProxy cluster; node-a forwards to your servers, and node-b stands by to take the address over. The manager, outside the traffic path, runs the web interface and engine with PostgreSQL. It asks the nodes to fetch over SSH, and the nodes fetch releases and certificates from it.">
+  </picture>
+  <figcaption>The manager is outside the traffic path and never pushes to a node: it asks the node to
+  fetch, and the node checks a release before it switches to it.</figcaption>
+</figure>
+
+<h2>What it does</h2>
+<div class="grid">
+  <section class="card">
+    <h3>Proxies and clusters</h3>
+    <ul>
+      <li>HTTP, HTTPS and TCP objects, edited as drafts and published as versions</li>
+      <li>deploys rolled out node by node, bound to the version you saw</li>
+      <li>DNS load balancing through dnsdist, and syslog over UDP</li>
+      <li>a virtual address carried by keepalived; draining and maintenance per server</li>
+    </ul>
+  </section>
+  <section class="card">
+    <h3>Access and protection</h3>
+    <ul>
+      <li>who may reach an object - by address, range, named network or country</li>
+      <li>rules on path, method and headers, and rate limits per source</li>
+      <li>a WAF: Coraza with the OWASP Core Rule Set, in log or block mode</li>
+    </ul>
+  </section>
+  <section class="card">
+    <h3>Certificates</h3>
+    <ul>
+      <li>issued from one form through ACME, with HTTP-01 or DNS-01</li>
+      <li>enrollment from a Microsoft CA over NDES/SCEP, or import</li>
+      <li>distributed to the nodes and to other hosts that fetch them</li>
+    </ul>
+  </section>
+  <section class="card">
+    <h3>Operations</h3>
+    <ul>
+      <li>status, metrics and a seven-day traffic log</li>
+      <li>node backups, and restoring a node onto an empty VM</li>
+      <li>OpenID Connect sign-in, and every change to a cluster recorded as a job</li>
+    </ul>
+  </section>
+</div>
+
+<h2>Install</h2>
+<p>A manager and one or more nodes, each with Ubuntu 26.04 or Debian 13. Add the project's signed apt
+repository on every machine (<code>sudo apt install curl</code> first if the machine has no curl).</p>
+
+<div class="distros">
+<div>
+<p>On <strong>Ubuntu 26.04</strong>:</p>
+<pre><code>sudo curl -fsSLo /usr/share/keyrings/haprion-archive-keyring.asc \
+  https://haprion.github.io/haprion/haprion-archive-keyring.asc
+sudo tee /etc/apt/sources.list.d/haprion.sources &gt;/dev/null &lt;&lt;'EOF'
+Types: deb
+URIs: https://haprion.github.io/haprion/
+Suites: ubuntu26.04
+Components: main
+Signed-By: /usr/share/keyrings/haprion-archive-keyring.asc
+EOF
+sudo apt update</code></pre>
+</div>
+<div>
+<p>On <strong>Debian 13</strong>:</p>
+<pre><code>sudo curl -fsSLo /usr/share/keyrings/haprion-archive-keyring.asc \
+  https://haprion.github.io/haprion/haprion-archive-keyring.asc
+sudo tee /etc/apt/sources.list.d/haprion.sources &gt;/dev/null &lt;&lt;'EOF'
+Types: deb
+URIs: https://haprion.github.io/haprion/
+Suites: deb13
+Components: main
+Signed-By: /usr/share/keyrings/haprion-archive-keyring.asc
+EOF
+sudo apt update</code></pre>
+</div>
+</div>
+
+<p>Then, on the manager:</p>
+<pre><code>sudo apt install haprion-ui
+sudo haprion-setup</code></pre>
+<p>and on each node:</p>
+<pre><code>sudo apt install haprion-node</code></pre>
+<p>The <a href="https://github.com/haprion/haprion/blob/main/docs/quickstart.md">quickstart</a> goes on
+from there to a site served by your HAProxy nodes. The repository key's fingerprint is
+<code>927422B0C5F005E0B710E4FFF30F5055A9FC0A53</code>.</p>
+
+<footer>
+  Haprion is free software under the GNU AGPL v3 or later.
+  <a href="https://github.com/haprion/haprion">github.com/haprion/haprion</a>
+</footer>
+</main>
+</body>
+</html>
