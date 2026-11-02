@@ -10,6 +10,7 @@
 <meta property="og:title" content="Haprion">
 <meta property="og:description" content="Run small HAProxy clusters from one place - load balancing, failover, a WAF and certificates - without having to master HAProxy.">
 <meta property="og:url" content="https://haprion.github.io/">
+<meta property="og:image" content="https://haprion.github.io/images/screenshot-dashboard-light.png">
 <meta name="color-scheme" content="light dark">
 <style>
 :root {
@@ -74,6 +75,10 @@ a { color: var(--accent); }
   .distros { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .distros pre { font-size: 0.8rem; }
 }
+.note { color: var(--muted); margin: 0 0 16px; }
+.shots { display: grid; gap: 40px; }
+.shots figcaption { color: var(--text); font-size: 1rem; margin: 0 0 12px; max-width: 44em; }
+.shots img { max-width: 100%; border: 1px solid var(--line); border-radius: 6px; }
 footer { color: var(--muted); font-size: 0.9rem; border-top: 1px solid var(--line); margin-top: 56px; padding-top: 16px; }
 @media (max-width: 720px) {
   main { padding: 0 16px 48px; }
@@ -144,6 +149,46 @@ footer { color: var(--muted); font-size: 0.9rem; border-top: 1px solid var(--lin
       <li>OpenID Connect sign-in, and every change to a cluster recorded as a job</li>
     </ul>
   </section>
+</div>
+
+<h2>Screenshots</h2>
+<p class="note">Made with invented clusters, names and addresses.</p>
+<div class="shots">
+  <figure>
+    <figcaption><strong>The dashboard.</strong> Every cluster and node at a glance: which node holds the virtual address, how much traffic passes, and what needs attention.</figcaption>
+    <picture>
+      <source media="(prefers-color-scheme: dark)" srcset="images/screenshot-dashboard-dark.png">
+      <img src="images/screenshot-dashboard-light.png" width="1440" height="1300" loading="lazy" alt="The dashboard: two clusters with two nodes each, the node holding the virtual address marked as owner, traffic figures per cluster, and a short list of what needs attention.">
+    </picture>
+  </figure>
+  <figure>
+    <figcaption><strong>A proxy is a form.</strong> Hostnames, certificate, servers and health check. Haprion writes the HAProxy configuration from it.</figcaption>
+    <picture>
+      <source media="(prefers-color-scheme: dark)" srcset="images/screenshot-proxy-dark.png">
+      <img src="images/screenshot-proxy-light.png" width="1440" height="1666" loading="lazy" alt="Editing a proxy: name, hostnames, protocol, virtual address and certificate; three servers with round-robin balancing; an HTTP health check, and what each node reports for each server.">
+    </picture>
+  </figure>
+  <figure>
+    <figcaption><strong>Certificates.</strong> Issued or imported once, used by every cluster that needs them, with the expiry dates in view.</figcaption>
+    <picture>
+      <source media="(prefers-color-scheme: dark)" srcset="images/screenshot-certificates-dark.png">
+      <img src="images/screenshot-certificates-light.png" width="1440" height="561" loading="lazy" alt="The certificate list: one renewed by certbot and two imported, the clusters using each, when each expires, and one expired certificate marked.">
+    </picture>
+  </figure>
+  <figure>
+    <figcaption><strong>The traffic log.</strong> Every request from every node, searchable, with the rule that stopped it.</figcaption>
+    <picture>
+      <source media="(prefers-color-scheme: dark)" srcset="images/screenshot-traffic-log-dark.png">
+      <img src="images/screenshot-traffic-log-light.png" width="1440" height="1006" loading="lazy" alt="The traffic log: requests with time, node, client, host and path, status, and the server that answered; a few stopped by the WAF, by dynamic blocking and by an access rule.">
+    </picture>
+  </figure>
+  <figure>
+    <figcaption><strong>Every publish is a version.</strong> What changed in the proxy and in the configuration it produced, and a way back.</figcaption>
+    <picture>
+      <source media="(prefers-color-scheme: dark)" srcset="images/screenshot-version-dark.png">
+      <img src="images/screenshot-version-light.png" width="1440" height="566" loading="lazy" alt="One version's changes: the proxy's health check interval shortened, and the HAProxy server line it changed.">
+    </picture>
+  </figure>
 </div>
 
 <h2>Install</h2>
